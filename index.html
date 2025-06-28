@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slack‑style Landing</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="nav">
+    <div class="container nav__wrap">
+      <img src="img/team.png" alt="" class="logo"></img>
+      <ul class="nav__menu">
+        <li><a href="#product">Product</a></li>
+        <li><a href="#solutions">Solutions</a></li>
+        <li><a href="#enterprise">Enterprise</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+      <div class="nav__actions">
+        <a href="#" class="link">Sign&nbsp;in</a>
+        <a href="#" class="btn btn--outline">Try&nbsp;for&nbsp;free</a>
+        <button class="burger" id="burger" aria-label="Open menu"></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <h1 class="hero__title">Great teamwork starts with a</h1>
+        <p class="hero__subtitle">
+          With all your people, tools and communication in one place, you can work
+          faster and more flexibly than ever before.
+        </p>
+
+        <div class="hero__buttons">
+          <a href="#" class="btn btn--light">Sign up with Email</a>
+          <a href="#" class="btn btn--google">
+            <img class="button_img_button" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" />
+            Sign up with Google
+          </a>
+        </div>
+
+        <small class="hero__note">Slack is free to try for as long as you’d like</small>
+      </div>
+
+      <div class="hero__img">
+        <!-- заміни свій mockup -->
+        <img src="img/headimg.jpg" alt="App mockup">
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== BENEFITS ===== -->
+  <section class="benefits" id="product">
+    <div class="container benefits__grid">
+      <article class="benefit">
+        <img src="img/icon‑chat.svg" alt="" class="benefit__icon">
+        <h3 class="benefit__title">Channels</h3>
+        <p class="benefit__text">Organise conversations by topic, project or team.</p>
+      </article>
+
+      <article class="benefit">
+        <img src="img/icon‑workflow.svg" alt="" class="benefit__icon">
+        <h3 class="benefit__title">Workflows</h3>
+        <p class="benefit__text">Automate routine tasks in just a few clicks.</p>
+      </article>
+
+      <article class="benefit">
+        <img src="img/icon‑integrations.svg" alt="" class="benefit__icon">
+        <h3 class="benefit__title">Integrations</h3>
+        <p class="benefit__text">Connect 2,600+ tools you already use.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features" id="solutions">
+    <div class="container">
+      <h2 class="section__title">Everything in one place</h2>
+
+      <div class="feature feature--reverse">
+        <div class="feature__img"><img src="img/feature‑1.jpg" alt=""></div>
+        <div class="feature__content">
+          <h3>Stay on the same page</h3>
+          <p>Channels keep everyone in the loop and make it easy to collaborate.</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <div class="feature__img"><img src="img/feature‑2.jpg" alt=""></div>
+        <div class="feature__content">
+          <h3>Move faster with automation</h3>
+          <p>Reduce busywork by automating routine tasks using Workflow Builder.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2 class="section__title">Pricing plans</h2>
+      <div class="pricing__grid">
+        <div class="price‑card">
+          <h4>Free</h4>
+          <p class="price">$0</p>
+          <ul>
+            <li>10k recent messages</li>
+            <li>10 integrations</li>
+            <li>1:1 huddles only</li>
+          </ul>
+          <a href="#" class="btn-up">Get Started</a>
+        </div>
+
+        <div class="price‑card price‑card--recommended">
+          <h4>Pro</h4>
+          <p class="price">$8<span>/mo</span></p>
+          <ul>
+            <li>Unlimited messages</li>
+            <li>Unlimited integrations</li>
+            <li>Group huddles</li>
+          </ul>
+          <a href="#" class="btn-up">Upgrade</a>
+        </div>
+
+        <div class="price‑card">
+          <h4>Business+</h4>
+          <p class="price">$15<span>/mo</span></p>
+          <ul>
+            <li>SAML‑based SSO</li>
+            <li>Data exports</li>
+            <li>24/7 support</li>
+          </ul>
+          <a href="#" class="btn-up">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta">
+    <div class="container cta__wrap">
+      <h2 class="cta__title">Ready to make the change?</h2>
+      <a href="#" class="btn btn--light btn--lg">Try Slack for free</a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__col">
+        <a href="#" class="logo">LOGO</a>
+        <p>© 2025 Your Company</p>
+      </div>
+      <div class="footer__col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Roadmap</a></li>
+          <li><a href="#">Integrations</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* Примітивний burger toggle */
+    const burger = document.getElementById('burger');
+    const menu   = document.querySelector('.nav__menu');
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      menu.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
