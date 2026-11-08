@@ -38,14 +38,16 @@ async function newPage(browser) {
   const chunk = Math.ceil(frames.length / WORKERS); let done = 0;
   await Promise.all(Array.from({ length: WORKERS }, async (_, w) => {
     const mine = frames.slice(w * chunk, (w + 1) * chunk); if (!mine.length) return;
-    const page = await newPage(browser);
+    // one Chromium per worker: screenshots of several pages in one browser serialize on the compositor
+    const own = w === 0 ? browser : await chromium.launch({ args: ['--force-color-profile=srgb', '--disable-gpu-vsync'] });
+    const page = await newPage(own);
     for (const f of mine) {
       const t = f / FPS;
       await page.evaluate(t => window.render(t), t);
       await page.screenshot({ path: path.join(OUT, `f${String(f).padStart(5, '0')}.png`), type: 'png' });
       if (++done % 100 === 0) console.log(`${done}/${frames.length} frames, ${((Date.now() - t0) / 1000).toFixed(0)}s`);
     }
-    await page.close();
+    await page.close(); if (own !== browser) await own.close();
   }));
   await browser.close();
   console.log(`done ${frames.length} frames in ${((Date.now() - t0) / 1000).toFixed(0)}s → ${OUT}`);

@@ -14,6 +14,12 @@
 Русская озвучка — нейросетевой голос Piper (`ru_RU-ruslan-medium`), текст и таймкоды в
 `docs/voiceover_script.md`, субтитры — `docs/subtitles_ru.srt`.
 
+Кинематографические приёмы: обычный ноутбук на деревянной скамье в молитвенном доме (камера «ныряет»
+в экран), склейки на долях такта 128 BPM с короткой вспышкой и панч-зумом, лёгкий 3D-дрейф камеры,
+плёночное зерно и виньетка, тёплые световые блики в церковной части, кинетические титры слов озвучки
+(«САЙТЫ · БОТЫ · ПРИЛОЖЕНИЯ · АВТОМАТИЗАЦИЯ»), анаморфный блик на ударе титра. Музыка: фортепиано →
+дроп с мелодическим хуком (плак + колокольчик) → брейкдаун → снэр-ролл и райзер → удар и F-мажорная кода.
+
 ## Что здесь честно, а что нет
 
 Это **motion-graphics-аниматик**: все сцены — интерфейсы, типографика и стилизованные пространства,
@@ -28,9 +34,7 @@ cd video/src
 python3 -m pip install numpy scipy        # звук
 python3 audio.py ../out/audio             # → music.wav, vo.wav, mix.wav
 node render.js --out ../out/frames        # нужен playwright + chromium (require('playwright'))
-ffmpeg -y -framerate 30 -i ../out/frames/f%05d.png -i ../out/audio/mix.wav \
-  -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest \
-  -movflags +faststart ../out/codecode_promo_60s.mp4
+./encode.sh                               # → ../out/codecode_promo_60s.mp4, poster.jpg, contact_sheet.jpg
 ```
 
 Проверить отдельный кадр: `node render.js --stills 7.2,15.6,52.9 --out ../out/stills`
@@ -52,6 +56,7 @@ echo "В нашей церкви начинается новое служени�
 | `src/scenes_a.js`, `scenes_b.js`, `scenes_c.js` | 15 сцен |
 | `src/style.css`, `src/index.html` | стили и оболочка |
 | `src/render.js` | Playwright-рендер кадров и стоп-кадров |
+| `src/encode.sh` | сборка MP4 (H.264/AAC), постер, контрольный лист, mp3 саундтрека |
 | `src/audio.py` | синтез музыки и SFX, дакинг под голос |
 | `assets/fonts` | Playfair Display, Manrope, JetBrains Mono (Google Fonts, OFL) |
 | `assets/vo` | озвучка (4 реплики × 2 голоса) |

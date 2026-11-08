@@ -22,9 +22,10 @@ export function выбрать(список) {
 }`;
   const COMMITS = [[0, 'feat: расписание служений'], [1, 'fix: форма записи работает на телефоне'], [6, 'docs: инструкция для новичков'], [3, 'feat: напоминание о репетиции хора (наконец-то)'], [2, 'chore: удалил 47 лишних console.log'], [5, 'fix: кнопка «Записаться» теперь действительно записывает']];
   registerScene('teamwork', {
+    drift: true,
     build(root) {
-      bgNavy(root, 'rgba(88,166,255,.3)'); label(root, '05', 'Команда · вместе');
-      root.insertAdjacentHTML('beforeend', `
+      const scr = E.laptopFrame(root); bgNavy(scr, 'rgba(88,166,255,.3)'); label(root, '05', 'Команда · вместе');
+      scr.insertAdjacentHTML('beforeend', `
       <div class="win dark" style="left:110px;top:150px;width:1180px;height:830px">
         <div class="winbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">расписание.js</span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px"><div style="display:flex">${[0, 1, 6, 3].map((i, k) => `<span class="avatar" style="width:28px;height:28px;font-size:12px;background:${COLORS[i]};margin-left:${k ? -8 : 0}px;border:2px solid #0d1117">${NAMES[i][0]}</span>`).join('')}</div><span style="font-size:14px;color:#3fb950">● 4 онлайн</span></div></div>
@@ -41,6 +42,7 @@ export function выбрать(список) {
       const feed = root.querySelector('.feed'); this.items = COMMITS.map(c => { const d = el('div', '', `<div style="display:flex;gap:12px;align-items:flex-start">${avatar(c[0], 34)}<div><div style="font-size:16px;line-height:1.3"><b style="color:#e6edf3">${NAMES[c[0]]}</b> <span style="color:var(--muted)">закоммитил(а)</span></div><div class="mono" style="font-size:15px;color:#a5d6ff;margin-top:5px;line-height:1.35">${c[1]}</div></div></div>`, feed); d.style.cssText = 'background:#0d1117;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 14px;opacity:0'; return d; });
     },
     render(lt, t) {
+      E.laptopPush(this.root, lt);
       this.src.innerHTML = codeHTML(SCHED_JS, 'js', t, E.barT(10) + 0.25, E.barT(10) + 3.45, false);
       const lines = [1, 5, 9, 13];
       this.curs.forEach((c, i) => { const b = Math.floor(lt / 0.47); const ln = lines[i] + (Math.floor(prng(b, i) * 3) - 1), col = 60 + prng(b, i + 9) * 520; const on = prog(lt, 0.15 + i * 0.12, 0.4 + i * 0.12); c.style.opacity = on; c.style.transform = `translate(${col}px,${22 + ln * 28.5}px)`; });
@@ -50,6 +52,7 @@ export function выбрать(список) {
 
   /* ---------------- DEPLOY ---------------- */
   registerScene('deploy', {
+    drift: true,
     build(root) {
       bgNavy(root, 'rgba(63,185,80,.25)'); label(root, '06', 'Запуск');
       root.insertAdjacentHTML('beforeend', `
@@ -93,9 +96,10 @@ export function выбрать(список) {
 
   /* ---------------- HUMOR ---------------- */
   registerScene('humor', {
+    drift: true,
     build(root) {
-      bgNavy(root, 'rgba(240,179,91,.22)'); label(root, '07', 'Поддержка · 24/7');
-      root.insertAdjacentHTML('beforeend', `
+      const scr = E.laptopFrame(root); bgNavy(scr, 'rgba(240,179,91,.22)'); label(root, '07', 'Поддержка · 24/7');
+      scr.insertAdjacentHTML('beforeend', `
       <div class="win dark hcam" style="left:360px;top:130px;width:1200px;height:860px;transform-origin:50% 50%">
         <div class="winbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">чат · ИИ-ассистент</span><span style="margin-left:auto;font-size:14px;color:#3fb950">● онлайн</span></div>
         <div class="msgs" style="padding:34px 40px;display:flex;flex-direction:column;gap:18px;font-size:24px;line-height:1.4">
@@ -110,6 +114,7 @@ export function выбрать(список) {
       this.cam = root.querySelector('.hcam'); this.m = [0, 1, 2, 3, 4, 5].map(i => root.querySelector('.m' + i)); this.tx0 = this.m[0].querySelector('.tx'); this.tx3 = this.m[3].querySelector('.tx');
     },
     render(lt, t) {
+      E.laptopPush(this.root, lt);
       const T = [0.1, 0.95, 1.65, 1.72, 2.45, 3.05];
       this.m.forEach((m, i) => { const p = prog(lt, T[i], T[i] + 0.25, ease.outBack); m.style.opacity = p; m.style.transform = `translateY(${(1 - p) * 20}px) scale(${lerp(.96, 1, p)})`; });
       const a = 'Почему ничего не работает?!', b = 'Теперь работает. Спасибо!';
@@ -121,6 +126,7 @@ export function выбрать(список) {
 
   /* ---------------- NEWCOMERS ---------------- */
   registerScene('newcomers', {
+    drift: true,
     build(root) {
       el('div', 'abs', '', root).style.cssText = 'inset:0;background:linear-gradient(160deg,#120f1a 0%,#1b1626 50%,#0e0c14 100%)';
       el('div', 'bg-grid', '', root);

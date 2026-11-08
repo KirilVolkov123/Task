@@ -225,6 +225,19 @@ for b in range(0, 16):
     chord_bar(b, CH[name][:3], 0.32, 1700 + 700 * (b >= 8))
     arp_bar(b, CH[name], 0.36 if b < 8 else 0.42, 1.1 if b < 8 else 1.35)
     if b % 4 == 3: drums.add(crash(0.25, 1.8), bar(b + 1))
+# lead hook: a memorable 2-bar motif (Dm → Bb / F → C), bars 4–8 and 12–16
+def bell(midi, dur=0.5, vel=0.3):
+    n = int((dur + 0.6) * SR); t = t_axis(n); f = f_of(midi)
+    out = np.sin(2 * np.pi * f * t) * np.exp(-t / 0.35) + 0.4 * np.sin(2 * np.pi * f * 2.01 * t) * np.exp(-t / 0.18) + 0.15 * np.sin(2 * np.pi * f * 3 * t) * np.exp(-t / 0.1)
+    out *= (1 - np.exp(-t / 0.003))
+    return out / (np.max(np.abs(out)) + 1e-9) * vel
+HOOK = [(74, 0, 1.5), (77, 1.5, 0.5), (81, 2, 1), (79, 3, 1), (77, 4, 1.5), (74, 5.5, 0.5), (72, 6, 1), (74, 7, 1)]   # (midi, beat offset, beats)
+def hook_bars(b0, vel=0.36):
+    for m, off, ln in HOOK:
+        t = bar(b0) + off * BEAT
+        music.add(pluck(m, ln * BEAT, vel, 1.6), t, pan=0.1); music.add(bell(m, ln * BEAT, vel * 0.7), t, pan=-0.1)
+        music.add(pluck(m, ln * BEAT, vel * 0.45, 1.6), t + 3 * BEAT / 4, pan=-0.35)   # dotted-8th echo
+for b0 in (4, 6, 12, 14): hook_bars(b0, 0.34 if b0 < 12 else 0.4)
 # fill at the end of bar 15
 for k in range(4): drums.add(snare(0.4 + 0.1 * k), bar(15) + 3 * BEAT + k * BEAT / 4)
 # breakdown (bars 16–18): pad + piano motif, no drums
@@ -240,12 +253,16 @@ for b in (18, 19):
 # snare roll: 8ths → 16ths → 32nds
 roll = [bar(18) + k * BEAT / 2 for k in range(8)] + [bar(19) + k * BEAT / 4 for k in range(12)] + [bar(19) + 3 * BEAT + k * BEAT / 8 for k in range(8)]
 for i, t in enumerate(roll): drums.add(snare(0.25 + 0.5 * i / len(roll)), t)
+music.add(crash(0.5, 1.2)[::-1], bar(20) - 1.2)
+for b in range(0, 16, 2): sfx.add(noise_sweep(0.6, 4000, 300, 1.0, 0.25, rev=True), bar(b) - 0.6)   # downlifters into each cut
 # climax (bars 20–22): F major, everything
 drums.add(impact(0.85), bar(20)); drums.add(crash(0.7), bar(20))
 chord_bar(20, [53, 57, 60, 65, 69], 0.34, 3200, 2)
 music.add(pad([41, 48, 53], 2 * BAR, 500, 0.18, 0.02, 1.0), bar(20))
 for b in (20, 21):
     drum_bar(b, hats=True, claps=True, kicks=True, hat_vel=0.38); bass_bar(b, 41, 0.4); arp_bar(b, [53, 57, 60, 65], 0.44, 1.5)
+for m, off, ln in [(77, 0, 2), (81, 2, 2), (84, 4, 3), (81, 7, 1)]:
+    t = bar(20) + off * BEAT; music.add(pluck(m, ln * BEAT, 0.42, 1.7), t); music.add(bell(m, ln * BEAT, 0.3), t)
 # outro (bar 22 → end): piano resolution + pad tail
 T_OUT = bar(22)
 drums.add(crash(0.4), T_OUT)
@@ -300,17 +317,17 @@ for v in TL['voiceover']:
 VO_st = np.stack([VO, VO], 1); VO_st = VO_st + reverb(VO_st, make_ir(0.6, 5000)) * 0.08
 # duck music under the voice
 env = np.abs(VO); k = int(0.25 * SR); kern = np.ones(k) / k
-env = np.convolve(env, kern, mode='same'); env = env / (env.max() + 1e-9)
+env = fftconvolve(env, kern, mode='same'); env = env / (env.max() + 1e-9)
 # attack/release smoothing
-sm = np.zeros(N); a_c = np.exp(-1 / (0.02 * SR)); r_c = np.exp(-1 / (0.5 * SR)); cur = 0.0
+sm = np.zeros(N); a_c = np.exp(-64 / (0.03 * SR)); r_c = np.exp(-64 / (0.45 * SR)); cur = 0.0   # per 64-sample block
 for i in range(0, N, 64):
     tgt = env[i:i + 64].max(); c = a_c if tgt > cur else r_c; cur = c * cur + (1 - c) * tgt; sm[i:i + 64] = cur
-duck = 1 - 0.74 * np.clip(sm * 1.8, 0, 1)
-MIX = MUSIC * duck[:, None] * 0.75 + VO_st * 1.45
+duck = 1 - 0.88 * np.clip(sm * 2.0, 0, 1)
+MIX = MUSIC * duck[:, None] * 0.72 + VO_st * 1.6
 # report voice-over vs music bed during speech
 for v in TL['voiceover']:
     i0 = int(v['start'] * SR); i1 = min(N, i0 + int(2.5 * SR))
-    m = np.sqrt(np.mean((MUSIC[i0:i1] * duck[i0:i1, None] * 0.75) ** 2)); s = np.sqrt(np.mean((VO_st[i0:i1] * 1.45) ** 2))
+    m = np.sqrt(np.mean((MUSIC[i0:i1] * duck[i0:i1, None] * 0.72) ** 2)); s = np.sqrt(np.mean((VO_st[i0:i1] * 1.6) ** 2))
     print(f"VO {v['start']:5.1f}s: voice {20*np.log10(s+1e-9):6.1f} dB  music bed {20*np.log10(m+1e-9):6.1f} dB  margin {20*np.log10(s/(m+1e-9)):5.1f} dB")
 
 def write(path, buf, peak=0.95):

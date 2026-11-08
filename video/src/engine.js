@@ -156,7 +156,7 @@
 
   // ---------- scene registry & master render ----------
   window.registerScene = (id, def) => { SCENES[id] = def; };
-  let built = false, grainFrames, stage, grainEl, vignEl, flashEl, camEl, letterEl;
+  let built = false, grainFrames, stage, grainEl, vignEl, flashEl, camEl, kinEl, kinWords, leakEl, streakEl;
   function build() {
     stage = document.getElementById('stage');
     camEl = E.el('div', 'cam', '', stage);
@@ -166,6 +166,11 @@
       def.root = root; def.meta = sc; def.build(root, sc);
       root.style.display = 'none';
     }
+    // kinetic captions (VO words on beats)
+    kinEl = E.el('div', 'kinetic', '', stage);
+    kinWords = (TL.kinetic || []).map(k => ({ ...k, els: k.words.map((w, i) => E.el('span', 'kw' + (i === 0 ? ' first' : ''), E.esc(w[0]), kinEl)), tail: E.el('span', 'kw tail', E.esc(k.tail || ''), kinEl) }));
+    leakEl = E.el('div', 'leak', '', stage);
+    streakEl = E.el('div', 'streak', '', stage);
     vignEl = E.el('div', 'vignette', '', stage);
     grainEl = E.el('div', 'grain', '', stage);
     flashEl = E.el('div', 'flash', '', stage);
@@ -181,8 +186,29 @@
       const hold = def.holdAfter || 0; // allow scene to linger for crossfade
       const on = t >= sc.start && t < sc.end + hold;
       def.root.style.display = on ? 'block' : 'none';
-      if (on) def.render(t - sc.start, t, sc.end - sc.start, sc);
+      if (on) {
+        const lt = t - sc.start, dur = sc.end - sc.start;
+        def.render(lt, t, dur, sc);
+        // subtle 3D camera drift on montage scenes (documentary handheld feel)
+        if (def.drift) {
+          const ry = Math.sin(lt * 0.9 + sc.start) * 1.1, rx = Math.cos(lt * 0.7 + sc.start * 2) * 0.7, z = 1.035 + lt / dur * 0.03;
+          def.root.style.transform = `perspective(2600px) rotateY(${ry.toFixed(3)}deg) rotateX(${rx.toFixed(3)}deg) scale(${z.toFixed(4)})`;
+        }
+      }
     }
+    // kinetic captions
+    for (const k of kinWords) {
+      const on = t >= k.start && t < k.end; k.els.forEach(el => el.style.display = on ? '' : 'none'); k.tail.style.display = on ? '' : 'none';
+      if (!on) continue;
+      k.els.forEach((el, i) => { const a = k.words[i][1]; const p = E.prog(t, a, a + 0.18, E.ease.outBack); const out = 1 - E.prog(t, k.end - 0.3, k.end - 0.05); el.style.opacity = (p * out).toFixed(3); el.style.transform = `translateY(${((1 - p) * 30).toFixed(1)}px) scale(${E.lerp(1.25, 1, p).toFixed(3)})`; });
+      const tp = E.prog(t, k.tailAt, k.tailAt + 0.3, E.ease.out) * (1 - E.prog(t, k.end - 0.3, k.end - 0.05)); k.tail.style.opacity = tp.toFixed(3); k.tail.style.transform = `translateY(${((1 - tp) * 14).toFixed(1)}px)`;
+    }
+    // warm light leak in the church part, blue-ish in the finale
+    if (t < DROP || t >= E.barT(22)) { leakEl.style.opacity = (0.55 + 0.25 * Math.sin(t * 0.6)).toFixed(3); leakEl.style.transform = `translate(${(Math.sin(t * 0.21) * 160).toFixed(1)}px, ${(Math.cos(t * 0.17) * 90).toFixed(1)}px) rotate(${(t * 2).toFixed(2)}deg)`; }
+    else leakEl.style.opacity = 0;
+    // anamorphic streak on the title impact
+    const st = E.barT(20); const sp = t >= st ? Math.max(0, 1 - E.prog(t, st, st + 1.6, E.ease.out)) : 0;
+    streakEl.style.opacity = (sp * 0.9).toFixed(3); streakEl.style.transform = `scaleX(${E.lerp(0.2, 2.4, E.prog(t, st, st + 1.6, E.ease.out)).toFixed(3)})`;
     // beat punch zoom (montage only)
     let scale = 1;
     if (t >= DROP && t < E.barT(22)) scale += 0.028 * E.punch(t);

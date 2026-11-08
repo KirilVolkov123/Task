@@ -12,6 +12,20 @@
   const COLORS = ['#2563eb', '#db2777', '#16a34a', '#ea580c', '#7c3aed', '#0891b2', '#ca8a04', '#be123c', '#059669', '#4f46e5', '#c2410c', '#0d9488'];
   const avatar = (i, sz = 34) => `<span class="avatar" style="width:${sz}px;height:${sz}px;background:${COLORS[i % 12]};font-size:${sz * .42}px">${NAMES[i % 12][0]}</span>`;
   E.NAMES = NAMES; E.COLORS = COLORS; E.avatar = avatar; E.label = label; E.bgNavy = bgNavy;
+  // Ordinary laptop on a wooden pew in the prayer hall; the UI lives on its screen.
+  E.laptopFrame = (root) => {
+    root.insertAdjacentHTML('beforeend', `
+      <div class="hallbg abs"><div class="glowwin"></div><div class="plank"></div><div class="plankhl"></div>
+        <div class="bible2 serif caps">Библия</div><div class="mug"></div></div>
+      <div class="lapwrap abs"><div class="lapshadow"></div><div class="lapbase"><div class="trackpad"></div></div>
+        <div class="lapbezel"><div class="lapscreen"><div class="screen-content"></div><div class="glass"></div></div><div class="camdot"></div></div></div>`);
+    return root.querySelector('.screen-content');
+  };
+  E.laptopPush = (root, lt) => {
+    const p = E.prog(lt, 0.3, 1.15, E.ease.inOut);
+    const w = root.querySelector('.lapwrap'); w.style.transform = `translateY(${((1 - p) * 40).toFixed(1)}px) scale(${E.lerp(0.68, 1, p).toFixed(4)})`;
+    const h = root.querySelector('.hallbg'); h.style.opacity = (1 - E.prog(lt, 0.9, 1.2)).toFixed(3); h.style.transform = `scale(${E.lerp(1, 1.15, p).toFixed(3)})`;
+  };
 
   /* ---------------- EDITOR ---------------- */
   const SITE_HTML = `<!doctype html>
@@ -39,9 +53,10 @@
 </html>`;
   const PROMPT1 = 'Сделай сайт нашей церкви: расписание служений, форма записи на встречу, адаптивный дизайн.';
   registerScene('editor', {
+    drift: true,
     build(root) {
-      bgNavy(root); label(root, '01', 'Сайт церкви');
-      root.insertAdjacentHTML('beforeend', `
+      const scr = E.laptopFrame(root); bgNavy(scr); label(root, '01', 'Сайт церкви');
+      scr.insertAdjacentHTML('beforeend', `
       <div class="win dark" style="left:110px;top:150px;width:1700px;height:830px">
         <div class="winbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">церковь-сайт — index.html</span></div>
         <div class="editor">
@@ -59,6 +74,7 @@
       this.ln.innerHTML = Array.from({ length: 24 }, (_, i) => i + 1).join('<br>');
     },
     render(lt, t) {
+      E.laptopPush(this.root, lt);
       const typing = lt > 0.05 && lt < 1.2;
       this.p1.innerHTML = esc(typed(PROMPT1, lt, 0.05, 1.2)) + (typing ? '<i class="caret" style="height:.9em;width:.45em"></i>' : '');
       op(this.a1, prog(lt, 1.25, 1.5, ease.out)); tf(this.a1, `translateY(${(1 - prog(lt, 1.25, 1.5, ease.out)) * 14}px)`);
@@ -92,6 +108,7 @@
       </div>
     </div>`;
   registerScene('website', {
+    drift: true,
     build(root) {
       bgNavy(root, 'rgba(240,179,91,.25)'); label(root, '01', 'Сайт церкви · предпросмотр');
       root.insertAdjacentHTML('beforeend', `
@@ -149,6 +166,7 @@ async def announce(text: str):
     for chat_id in subscribers:
         await bot.send_message(chat_id, text)`;
   registerScene('telegram', {
+    drift: true,
     build(root) {
       bgNavy(root, 'rgba(45,212,191,.28)'); label(root, '02', 'Telegram-бот объявлений');
       root.insertAdjacentHTML('beforeend', `
@@ -184,10 +202,11 @@ async def announce(text: str):
 
   /* ---------------- REGISTRATION ---------------- */
   registerScene('registration', {
+    drift: true,
     build(root) {
-      bgNavy(root, 'rgba(167,139,250,.28)'); label(root, '03', 'Система регистрации');
+      const scr = E.laptopFrame(root); bgNavy(scr, 'rgba(167,139,250,.28)'); label(root, '03', 'Система регистрации');
       const fields = [['Имя и фамилия', 'Анна Ковальчук'], ['Телефон', '+380 67 123 45 67'], ['Церковь / город', '«Вифания», Ровно'], ['Возраст', '19']];
-      root.insertAdjacentHTML('beforeend', `
+      scr.insertAdjacentHTML('beforeend', `
       <div class="card frm" style="position:absolute;left:120px;top:170px;width:900px;height:790px;padding:46px 52px;transform-origin:50% 50%">
         <div class="kicker" style="color:#7c3aed">Молодёжный лагерь «Источник»</div>
         <div class="serif" style="font-size:40px;font-weight:700;margin-top:10px;color:#1f1030">Регистрация участника</div>
@@ -220,6 +239,7 @@ async def announce(text: str):
       this.num = root.querySelector('.num'); this.bar = root.querySelector('.bar'); this.cap = root.querySelector('.cap'); this.ab = root.querySelector('.ab');
     },
     render(lt, t) {
+      E.laptopPush(this.root, lt);
       const pop = prog(lt, 0, 0.5, ease.outBack); tf(this.frm, `scale(${lerp(.92, 1, pop)})`); op(this.frm, prog(lt, 0, .2));
       const starts = [0.3, 0.9, 1.5, 2.1];
       this.flds.forEach((f, i) => {
@@ -238,6 +258,7 @@ async def announce(text: str):
 
   /* ---------------- SCHEDULE ---------------- */
   registerScene('schedule', {
+    drift: true,
     build(root) {
       bgNavy(root, 'rgba(45,212,191,.25)'); label(root, '04', 'График служения');
       const cols = ['Вс · 10:00', 'Ср · 19:00', 'Пт · 18:00', 'Вс · 10:00 (след.)'];
