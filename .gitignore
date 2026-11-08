@@ -1,0 +1,7 @@
+# video render intermediates (regenerate with video/src/render.js)
+video/out/frames/
+video/out/stills*/
+video/out/render.log
+video/src/timeline.js
+__pycache__/
+video/out/audio/*.wav

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>CODE:CODE — promo renderer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage"></div>
+<script src="timeline.js"></script>
+<script src="engine.js"></script>
+<script src="scenes_a.js"></script>
+<script src="scenes_b.js"></script>
+<script src="scenes_c.js"></script>
+<script>
+  // Preview mode in a normal browser: ?t=12.5 renders one frame; ?play=1 plays in real time.
+  (function(){
+    const q = new URLSearchParams(location.search);
+    if (q.has('t')) { document.fonts.ready.then(()=>render(parseFloat(q.get('t')))); }
+    if (q.has('play')) { const t0 = performance.now(); const loop = ()=>{ const t=(performance.now()-t0)/1000; render(Math.min(t, TL.duration-0.001)); if (t<TL.duration) requestAnimationFrame(loop); }; document.fonts.ready.then(loop); }
+  })();
+</script>
+</body>
+</html>
